@@ -14,20 +14,25 @@ import com.example.guesstheword.databinding.ScoreFragmentBinding
  */
 class ScoreFragment : Fragment() {
 
+    private lateinit var viewModel: ScoreViewModel
+    private lateinit var viewModelFactory: ScoreViewModelFactory
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
 
-        // Inflate view and obtain an instance of the binding class.
         val binding: ScoreFragmentBinding = DataBindingUtil.inflate(
             inflater,
             R.layout.score_fragment,
             container,
-            false
-        )
-
+            false)
+        // factory class object is created, with the data need for viewModel
+        viewModelFactory = ScoreViewModelFactory(ScoreFragmentArgs.fromBundle(requireArguments()).score)
+        // factory is used to generate viewModel from its create() function
+        viewModel = viewModelFactory.create(ScoreViewModel::class.java)
+        binding.scoreText.text = viewModel.score.toString()
         return binding.root
     }
 }

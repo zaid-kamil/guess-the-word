@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.example.guesstheword.R
 import com.example.guesstheword.databinding.GameFragmentBinding
 
@@ -35,10 +36,17 @@ class GameFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(GameViewModel::class.java)
         binding.correctButton.setOnClickListener { onCorrect() }
         binding.skipButton.setOnClickListener { onSkip() }
+        binding.endGameButton.setOnClickListener{ onEndGame() }
         updateScoreText()
         updateWordText()
         return binding.root
 
+    }
+
+    private fun onEndGame(){
+        val directions = GameFragmentDirections.actionGameToScore()
+        directions.score = viewModel.score
+        findNavController().navigate(directions)
     }
 
     private fun onSkip() {
