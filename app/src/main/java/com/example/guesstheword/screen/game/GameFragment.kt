@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -35,31 +36,22 @@ class GameFragment : Fragment() {
         )
         Log.i("GameFragment", "Called ViewModelProvider.get")
         viewModel = ViewModelProvider(this).get(GameViewModel::class.java)
-        binding.correctButton.setOnClickListener { onCorrect() }
-        binding.skipButton.setOnClickListener { onSkip() }
-        binding.endGameButton.setOnClickListener { onEndGame() }
+        binding.gameViewModel = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
 
-        viewModel.score.observe(viewLifecycleOwner, Observer { newScore ->
-            binding.scoreText.text = newScore.toString()
-        })
-        viewModel.word.observe(viewLifecycleOwner, Observer { newWord ->
-            binding.wordText.text = newWord
+
+        // Observer for the Game finished event
+        viewModel.eventGameFinish.observe(viewLifecycleOwner, Observer<Boolean> { hasFinished ->
+            if (hasFinished) gameFinished()
         })
         return binding.root
-
     }
 
-    private fun onEndGame() {
+    private fun gameFinished() {
+        Toast.makeText(activity, "Game has just finished", Toast.LENGTH_SHORT).show()
         val directions = GameFragmentDirections.actionGameToScore()
         directions.score = viewModel.score.value ?: 0
         findNavController().navigate(directions)
-    }
-
-    private fun onSkip() {
-        viewModel.onSkip()
-    }
-
-    private fun onCorrect() {
-        viewModel.onCorrect()
+        viewModel.onGameFinishComplete()
     }
 }

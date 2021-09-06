@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import com.example.guesstheword.R
 import com.example.guesstheword.databinding.ScoreFragmentBinding
 
@@ -28,11 +30,19 @@ class ScoreFragment : Fragment() {
             R.layout.score_fragment,
             container,
             false)
-        // factory class object is created, with the data need for viewModel
+
         viewModelFactory = ScoreViewModelFactory(ScoreFragmentArgs.fromBundle(requireArguments()).score)
-        // factory is used to generate viewModel from its create() function
         viewModel = viewModelFactory.create(ScoreViewModel::class.java)
-        binding.scoreText.text = viewModel.score.toString()
+
+        binding.scoreViewModel = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
+
+        viewModel.eventPlayAgain.observe(viewLifecycleOwner, Observer { playAgain ->
+            if (playAgain) {
+                findNavController().navigate(ScoreFragmentDirections.actionRestart())
+                viewModel.onPlayAgainComplete()
+            }
+        })
         return binding.root
     }
 }
